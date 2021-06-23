@@ -17,6 +17,7 @@ import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
@@ -24,6 +25,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.italo.firebaseapp.model.Upload;
+import com.italo.firebaseapp.util.LoadingDialog;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -69,6 +71,8 @@ public class StorageActivity extends AppCompatActivity {
     }
 
     private void uploadImagemUri() {
+        LoadingDialog dialog = new LoadingDialog(this, R.layout.custom_dialog);
+        dialog.startLoadingDialog();
         String tipo = getFileExtension(imageUri);
         Date d = new Date();
         String nome = editNome.getText().toString();
@@ -89,7 +93,11 @@ public class StorageActivity extends AppCompatActivity {
                         Upload upload = new Upload(id,nome,uri.toString());
 
                         //salvando no database
-                        refUpload.setValue(upload);
+                        refUpload.setValue(upload).addOnSuccessListener(aVoid -> {
+                            dialog.dismissDialog();
+                            Toast.makeText(this, "Uplosd feito com sucesso", Toast.LENGTH_SHORT).show();
+                            finish();
+                        });
                     });
         })
         .addOnFailureListener(e -> {
