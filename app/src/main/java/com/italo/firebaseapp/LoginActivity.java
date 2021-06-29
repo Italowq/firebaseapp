@@ -17,10 +17,11 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 
 public class LoginActivity extends AppCompatActivity {
+
     private Button btnCadastrar;
     private Button btnLogin;
+    private EditText editEmail,editSenha;
 
-    private EditText editEmail, editSenha;
     private FirebaseAuth auth = FirebaseAuth.getInstance();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,55 +32,64 @@ public class LoginActivity extends AppCompatActivity {
         editEmail = findViewById(R.id.login_edit_email);
         editSenha = findViewById(R.id.login_edit_senha);
 
-        //caso usuarui logado
+        //caso usuario logado
         if(auth.getCurrentUser()!=null){
             String email = auth.getCurrentUser().getEmail();
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            //passar email p/ MainACtivity
-            intent.putExtra("email", email);
+            Intent intent = new Intent(getApplicationContext(),
+                    NavigationActivity.class);
+            //passar email p/ MainActivity
+            intent.putExtra("email",email);
             startActivity(intent);
         }
 
-        btnCadastrar.setOnClickListener( v -> {
-                Intent intent = new Intent(getApplicationContext(),CadastroActivity.class);
-                startActivity(intent);
-
+        btnCadastrar.setOnClickListener(view -> {
+            Intent intent = new Intent(getApplicationContext(),
+                    CadastroActivity.class);
+            startActivity(intent);
         });
-        btnLogin.setOnClickListener( v -> {
+        btnLogin.setOnClickListener( view -> {
             logar();
         });
     }
     public void logar(){
-            String email = editEmail.getText().toString();
-            String senha = editSenha.getText().toString();
-            if(email.isEmpty() || senha.isEmpty()){
-                Toast.makeText(this, "Preemcha o campo", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            // t - > é uma tarefa para logar
-            auth.signInWithEmailAndPassword(email,senha)
-            .addOnSuccessListener(authResult -> {
-                Toast.makeText(this, "Bem-Vindo", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
-            })
-            .addOnFailureListener( e -> {
-                try{
-                    //disparando a exceçâo
-                    throw e;
-                }catch (FirebaseAuthInvalidUserException userException){
-                    //Exceção para email invalido
-                    Toast.makeText(this, "E-mail invalido!", Toast.LENGTH_SHORT).show();
-                }catch (FirebaseAuthInvalidCredentialsException credException){
-                    //Exceção para senha incorreta
-                    Toast.makeText(this, "Senha incorreta!", Toast.LENGTH_SHORT).show();
-                }catch(Exception ex){
-                    //Exceção genérica
-                    Toast.makeText(this, "Erro1", Toast.LENGTH_SHORT).show();
-                }
+        String email = editEmail.getText().toString();
+        String senha = editSenha.getText().toString();
+        if(email.isEmpty() || senha.isEmpty()){
+            Toast.makeText(this,"Preencha os campos",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+        // t -> é uma tarefa para logar
+        auth.signInWithEmailAndPassword(email,senha)
+                .addOnSuccessListener(authResult -> {
+                    Toast.makeText(this, "Bem vindo" ,
+                            Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getApplicationContext(),
+                            MainActivity.class);
+                    startActivity(intent);
+                })
+                .addOnFailureListener( e -> {
+                    try {
+                        //disparando a exceção
+                        throw e;
+                    }catch (FirebaseAuthInvalidUserException userException){
+                        //exceção para email invalido
+                        Toast.makeText(this,"E-mail inválido!",
+                                Toast.LENGTH_SHORT).show();
+                    }catch(FirebaseAuthInvalidCredentialsException credException){
+                        //excecao p/ senha incorreta
+                        Toast.makeText(this,"Senha incorreta!",
+                                Toast.LENGTH_SHORT).show();
+                    }catch(Exception ex){
+                        //excecao genérica
+                        Toast.makeText(this, "Erro!", Toast.LENGTH_SHORT).show();
+                    }
 
 
+                });
 
-            });
+
     }
+
+
 }

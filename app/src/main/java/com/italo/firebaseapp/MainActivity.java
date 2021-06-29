@@ -2,6 +2,8 @@ package com.italo.firebaseapp;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -10,6 +12,7 @@ import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,8 +32,10 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private FirebaseAuth auth = FirebaseAuth.getInstance();
-    private Button btnLogout, btnStorage;
-    private DatabaseReference database= FirebaseDatabase.getInstance().getReference("upload");
+    private Button btnLogout,btnStorage;
+    private DatabaseReference database  = FirebaseDatabase.getInstance()
+            .getReference("uploads");
+
     private ArrayList<Upload> listaUploads = new ArrayList<>();
 
     private RecyclerView recyclerView;
@@ -40,10 +45,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         btnLogout = findViewById(R.id.main_btn_logout);
         btnStorage = findViewById(R.id.main_btn_storage);
         recyclerView = findViewById(R.id.main_recycler);
-        imageAdapter = new ImageAdapter(getApplicationContext(), listaUploads);
+
+        imageAdapter = new ImageAdapter(getApplicationContext(),listaUploads);
         imageAdapter.setListener(new ImageAdapter.OnItemClickListener() {
             @Override
             public void onDeleteClick(int position) {
@@ -53,62 +60,106 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onUpdateClick(int position) {
-
+                Upload upload = listaUploads.get(position);
+                Intent intent = new Intent(getApplicationContext(),
+                        UpdateActivity.class);
+                //envia o upload para outra Activity
+                intent.putExtra("upload",upload);
+                startActivity(intent);
             }
         });
-        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        recyclerView.setLayoutManager(
+                new LinearLayoutManager(getApplicationContext())
+        );
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(imageAdapter);
 
+
+
+        btnStorage.setOnClickListener(v -> {
+            //abrir StorageActivity
+            Intent intent = new Intent(getApplicationContext(),
+                    StorageActivity.class);
+            startActivity(intent);
+        });
+
         btnLogout.setOnClickListener(v -> {
-            //deslogarUsuario
+            //deslogar usuario
             auth.signOut();
             finish();
         });
-        btnStorage.setOnClickListener(v -> {
-            Intent intent = new Intent(getApplicationContext(),StorageActivity.class);
-            startActivity(intent);
-        });
-        TextView textEmail = findViewById(R.id.main_text_email);
+        TextView textEmail =  findViewById(R.id.main_text_email);
         textEmail.setText(auth.getCurrentUser().getEmail());
-        TextView textNome = findViewById(R.id.main_text_user);
+
+        TextView textNome =  findViewById(R.id.main_text_user);
         textNome.setText(auth.getCurrentUser().getDisplayName());
 
+
+    }
+    public class NavigationActivity extends AppCompatActivity {
+        private ImageView btnMenu;
+        private DrawerLayout drawerLayout;
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_navigation);
+
+            btnMenu = findViewById(R.id.navigation_icon);
+            drawerLayout = findViewById(R.id.nav_drawerLayout);
+
+            btnMenu.setOnClickListener( view -> {
+                drawerLayout.openDrawer(GravityCompat.START);
+            });
+        }
     }
 
     @Override
     protected void onStart() {
-        //onStart -> faz parte do ciclo de vida activity
-        // -> É executado quando o app inicia
-        // - e quamdo volta d background
+        // onStart:
+        /*    - faz parte do ciclo de vida da Activity, depois do onCreate()
+         *      - É executado quando app inicia,
+         *      - e quando volta do background
+         *  */
         super.onStart();
         getData();
     }
+
     public void deleteUpload(Upload upload){
-        LoadingDialog dialog = new LoadingDialog(this, R.layout.custom_dialog);
+        LoadingDialog dialog = new LoadingDialog(this,
+                R.layout.custom_dialog);
         dialog.startLoadingDialog();
 
         //deletar img no storage
-        StorageReference imagemRef = FirebaseStorage.getInstance().getReferenceFromUrl(upload.getUrl());
-        imagemRef.delete().addOnSuccessListener(aVoid -> {
-            //deletar imagem no database
-            database.child(upload.getId()).removeValue().addOnSuccessListener(aVoid1 -> {
-                Toast.makeText(getApplicationContext(), "Item deletado", Toast.LENGTH_SHORT).show();
-                dialog.dismissDialog();
-            });
-        });
+        StorageReference imagemRef = FirebaseStorage
+                .getInstance()
+                .getReferenceFromUrl(upload.getUrl());
+
+        imagemRef.delete()
+                .addOnSuccessListener(aVoid -> {
+                    // deletar img no database
+                    database.child(upload.getId()).removeValue()
+                            .addOnSuccessListener(aVoid1 -> {
+                                Toast.makeText(getApplicationContext(),
+                                        "Item deletado!", Toast.LENGTH_SHORT).show();
+                                dialog.dismissDialog();
+                            });
+                });
     }
+
+
     public void getData(){
         //listener p/ o nó uploads
-        // - caso ocorra alguma alteração -> retorna TODOS os dados
+        // - caso ocorra alguma alteracao -> retorna TODOS os dados!!
         database.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 listaUploads.clear();
-                for(DataSnapshot no_filho : snapshot.getChildren()){
+                for( DataSnapshot no_filho :  snapshot.getChildren()){
                     Upload upload = no_filho.getValue(Upload.class);
                     listaUploads.add(upload);
-                    Log.i("DATABASE", "id: "+ upload.getId() + ",nome: "+ upload.getNomeImagem() );
+                    Log.i("DATABASE","id: " + upload.getId() + ",nome: "
+                            +  upload.getNomeImagem() );
+
                 }
                 imageAdapter.notifyDataSetChanged();
             }

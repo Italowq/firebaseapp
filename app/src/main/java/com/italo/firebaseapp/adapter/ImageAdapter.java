@@ -24,19 +24,24 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageVH> {
     private ArrayList<Upload> listaUploads;
 
     private OnItemClickListener listener;
-    public void setListener( OnItemClickListener listener ){
+
+    public void setListener( OnItemClickListener listener  ){
         this.listener = listener;
     }
 
-    public  ImageAdapter(Context c, ArrayList<Upload> l){
+
+
+    public ImageAdapter(Context c, ArrayList<Upload> l){
         this.context=c;
         this.listaUploads = l;
     }
 
+
     @NonNull
     @Override
     public ImageVH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(context).inflate(R.layout.image_item, parent, false);
+        View v = LayoutInflater.from(context)
+                .inflate(R.layout.image_item,parent,false);
 
         return new ImageVH(v);
     }
@@ -45,20 +50,21 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageVH> {
     public void onBindViewHolder(@NonNull ImageVH holder, int position) {
         Upload upload = listaUploads.get(position);
         holder.textNome.setText(upload.getNomeImagem());
-        //Setar a imagem atravez da Glide
-        Glide.with(context).load(upload.getUrl()).into(holder.imageView);
-        upload.getUrl();
+        //setar a imagem -> Glide
+        Glide.with(context)
+                .load(upload.getUrl())
+                .into(holder.imageView);
+
     }
-    //Retorna o tamanho da lista
+
     @Override
     public int getItemCount() {
         return listaUploads.size();
     }
 
-    public  class ImageVH extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
+    public class  ImageVH  extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
         TextView textNome;
         ImageView imageView;
-
 
         public ImageVH(@NonNull View itemView) {
             super(itemView);
@@ -68,21 +74,32 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageVH> {
             itemView.setOnCreateContextMenuListener(this);
         }
 
+
         @Override
-        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            menu.setHeaderTitle("Selecionar Ação");
-            MenuItem deletar = menu.add(0, 1, 1, "Deletar");
-            menu.add(0, 2, 2, "Atualizar");
-            //Evento de clique na opção deletar
-            deletar.setOnMenuItemClickListener(item -> {
+        public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
+            menu.setHeaderTitle("Selecionar ação");
+
+            MenuItem deletar = menu.add(0, 1,1, "Deletar");
+            MenuItem atualizar = menu.add(0, 2,2, "Atualizar");
+            //evento de clique na opcao deletar
+            deletar.setOnMenuItemClickListener(menuItem -> {
                 if(listener!=null){
                     int position = getAdapterPosition();
                     listener.onDeleteClick(position);
                 }
                 return true;
             });
+
+            atualizar.setOnMenuItemClickListener(menuItem -> {
+                if(listener!=null){
+                    int position = getAdapterPosition();
+                    listener.onUpdateClick(position);
+                }
+                return true;
+            });
         }
     }
+
     public interface OnItemClickListener {
         void onDeleteClick(int position);
 

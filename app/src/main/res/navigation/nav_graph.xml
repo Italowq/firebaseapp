@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/nav_menu_main">
+
+    <fragment
+        android:id="@+id/nav_menu_main"
+        android:name="com.italo.firebaseapp.fragment.MainFragment"
+        tools:layout="@layout/fragment_main"
+        />
+    <fragment
+        android:id="@+id/nav_menu_lista_imagens"
+        tools:layout="@layout/fragment_uploads"
+        android:name="com.italo.firebaseapp.fragment.UploadsFragment"
+        />
+    <fragment
+        android:id="@+id/nav_menu_storage"
+        tools:layout="@layout/fragment_storage"
+        android:name="com.italo.firebaseapp.fragment.StorageFragment"
+        />
+</navigation>

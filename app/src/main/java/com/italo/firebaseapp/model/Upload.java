@@ -2,7 +2,9 @@ package com.italo.firebaseapp.model;
 
 import android.net.Uri;
 
-public class Upload {
+import java.io.Serializable;
+
+public class Upload implements Serializable {
     private String id;
     private String nomeImagem;
     private String url;
