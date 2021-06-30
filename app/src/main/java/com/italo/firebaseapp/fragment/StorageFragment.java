@@ -27,6 +27,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -50,6 +51,7 @@ public class StorageFragment extends Fragment {
     // referencia p/ um nó RealtimeDB
     private DatabaseReference database = FirebaseDatabase.getInstance()
             .getReference("uploads");
+    private FirebaseAuth auth = FirebaseAuth.getInstance();
     public StorageFragment() {
     }
 
@@ -58,6 +60,8 @@ public class StorageFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        database = FirebaseDatabase.getInstance().getReference("uploads").child(auth.getUid());
         View layout = inflater.inflate(R.layout.fragment_storage, container, false);
 
         btnUpload = layout.findViewById(R.id.storage_btn_upload);
