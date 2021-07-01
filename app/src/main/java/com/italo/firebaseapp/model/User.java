@@ -2,6 +2,15 @@ package com.italo.firebaseapp.model;
 
 public class User {
     private String id, email, nome,photoUrl;
+    //Armazena se o usuario recebeu solicitaçâo
+    private boolean receiveRequest;
+
+    public void setReceiveRequest(boolean b){
+        this.receiveRequest = b;
+    }
+    public boolean getReceiveRequest(){
+        return receiveRequest;
+    }
     public User(){
 
     }
@@ -26,6 +35,10 @@ public class User {
 
     public String getPhotoUrl() {
         return photoUrl;
+    }
+
+    public boolean equals(User u){
+        return this.id.equals(u.getId());
     }
 
     public void setId(String id) {
