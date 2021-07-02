@@ -21,7 +21,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserVH> {
     private Context context;
     private ClickAdapterUser listener;
     private static final int TIPO_ADICIONAR = 0;
-    public static final int TIPO_SOLICITAR = 0;
+    public static final int TIPO_SOLICITAR = 1;
 
     public void setListener(ClickAdapterUser listener){
         this.listener = listener;

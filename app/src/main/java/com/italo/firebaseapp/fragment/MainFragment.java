@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SnapHelper;
 
+import android.provider.ContactsContract;
+import android.service.autofill.Dataset;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +29,8 @@ import com.italo.firebaseapp.adapter.UserAdapter;
 import com.italo.firebaseapp.model.User;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class MainFragment extends Fragment {
@@ -84,6 +88,46 @@ public class MainFragment extends Fragment {
         getUsersDatabase();
     }
     public void getUsersDatabase() {
+        Map<String,User> mapUsersReq = new HashMap<String, User>();
+        //Irá armazenar usuarios que ja foram solicitados
+        requestRef.child(userLogged.getId()).child("send")
+        .addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot u : snapshot.getChildren()){
+                    User user = u.getValue(User.class);
+                    //adicionar usuario no HashMap
+                    mapUsersReq.put(user.getId(), user);
+                }
+                //Ler o no dos usuarios
+                usersRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        listaContatos.clear();
+                        for(DataSnapshot u : snapshot.getChildren()){
+                            User user = u.getValue(User.class);
+                            if(mapUsersReq.containsKey(user.getId())){
+                                user.setReceiveRequest(true);
+                            }
+                            if (!userLogged.equals(user)) {
+                                listaContatos.add(user);
+                            }
+                        }
+                        userAdapter.notifyDataSetChanged();
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        /*
         usersRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -92,11 +136,11 @@ public class MainFragment extends Fragment {
                     User u = filho.getValue(User.class);
                     // comparar com usuario logado
                     if(!userLogged.equals(u)){
-                        /*if(cont%2==0){
+                        if(cont%2==0){
                             u.setReceiveRequest(true);
                         }else{
                             u.setReceiveRequest(false);
-                        }*/
+                        }
                         listaContatos.add(u);
                     }
                 }
@@ -125,7 +169,7 @@ public class MainFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        });*/
     }
 
 }

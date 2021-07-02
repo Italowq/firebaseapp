@@ -20,4 +20,9 @@
         tools:layout="@layout/fragment_storage"
         android:name="com.italo.firebaseapp.fragment.StorageFragment"
         />
+    <fragment
+        android:id="@+id/nav_menu_notification"
+        android:name="com.italo.firebaseapp.fragment.NotificationFragment"
+        tools:layout="@layout/fragment_notification"
+        />
 </navigation>
