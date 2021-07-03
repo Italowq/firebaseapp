@@ -22,6 +22,7 @@ import com.italo.firebaseapp.NavigationActivity;
 import com.italo.firebaseapp.R;
 import com.italo.firebaseapp.UpdateActivity;
 import com.italo.firebaseapp.util.App;
+import com.italo.firebaseapp.util.NotificationReceiver;
 
 import static com.italo.firebaseapp.util.App.CHANNEL_1;
 
@@ -48,12 +49,18 @@ public class NotificationFragment extends Fragment {
         btnSend.setOnClickListener(v -> {
             String title = editTitle.getText().toString();
             String msg = editMsg.getText().toString();
+
             Intent intent = new Intent(getContext(), NavigationActivity.class);
             PendingIntent contentIntent = new NavDeepLinkBuilder(getContext())
                     .setComponentName(NavigationActivity.class)
                     .setGraph(R.navigation.nav_graph)
                     .setDestination(R.id.nav_menu_lista_imagens)
                     .createPendingIntent();
+
+            Intent broadcastIntent = new Intent(getContext(), NotificationReceiver.class);
+            broadcastIntent.putExtra("toast", msg);
+            PendingIntent actionIntent = PendingIntent.getBroadcast(getContext(), 0, broadcastIntent,PendingIntent.FLAG_CANCEL_CURRENT
+            );
 
            /* PendingIntent contentIntent = PendingIntent.getActivity(getContext(),0,intent, 0);*/
             //Criar a notificação
@@ -68,6 +75,8 @@ public class NotificationFragment extends Fragment {
                     .build();
             notificationManager.notify(1,notification);
         });
+
+
 
         return layout;
     }

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.italo.firebaseapp">
-
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <application
         android:name=".util.App"
         android:allowBackup="true"
@@ -25,6 +26,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
+        <receiver android:name=".util.NotificationReceiver"/>
+        <service android:name=".util.NotificationService"/>
     </application>
 
 </manifest>
